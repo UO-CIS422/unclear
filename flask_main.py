@@ -3,8 +3,10 @@ Simple Flask web site
 """
 
 import flask    # The basic framework for http requests, storing cookies, etc
+import flask_sslify
 
 import logging  # For monitoring and debugging
+import os
 
 ###
 # Globals
@@ -13,8 +15,14 @@ import logging  # For monitoring and debugging
 import CONFIG   # Separate out per-machine configuration 
 app = flask.Flask(__name__)   
 app.secret_key = CONFIG.COOKIE_KEY
-app.debug=CONFIG.DEBUG
 app.logger.setLevel(logging.DEBUG)
+# On Heroku, debugging must be off to run https
+if 'DYNO' in os.environ: 
+    app.debug=False
+    sslify = flask_sslify.SSLify(app)
+else:
+    app.debug=CONFIG.DEBUG
+
 
 #################
 # Pages and request handling:
